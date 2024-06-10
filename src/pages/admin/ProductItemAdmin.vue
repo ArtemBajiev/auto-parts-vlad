@@ -102,15 +102,18 @@ function createType(text) {
     })
   })
 }
-if (route.params.id != 'new') {
-  getProductItem(route.params.id).then((res) => {
-    data.value = res.data.detail
-  })
-} else {
-  getTypes().then((res) => {
-    typeData.value = res.data.types
-  })
+function getData() {
+  if (route.params.id != 'new') {
+    getProductItem(route.params.id).then((res) => {
+      data.value = res.data.detail
+    })
+  } else {
+    getTypes().then((res) => {
+      typeData.value = res.data.types
+    })
+  }
 }
+getData()
 
 const editProd = () => {
   if (route.params.id == 'new') {
@@ -123,11 +126,15 @@ const editProd = () => {
       route.params.mod,
       data.value.type.id
     ).then((res) => {
-      uploadImage(file.value, res.data.detail.id).then(() => {
-        toast.success('Картинка загружена')
-        router.push({ name: 'product-item', params: { id: res.data.detail.id } })
-        location.reload()
-      })
+      if (file.value) {
+        uploadImage(file.value, res.data.detail.id).then(() => {
+          toast.success('Картинка загружена')
+          router.push({ name: 'product-item', params: { id: res.data.detail.id, type: null } })
+          getData()
+        })
+      } else {
+        getData()
+      }
       toast.success('Данные обновлены')
     })
   } else {

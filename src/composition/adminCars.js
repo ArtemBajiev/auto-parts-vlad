@@ -11,7 +11,6 @@ export default function adminCars() {
     return axios.post(api + '/api/brands/edit', { name, brandId })
   }
   const createDesign = (name, brandId) => {
-    alert(brandId)
     return axios.post(api + '/api/designs/create', { name, brandId })
   }
   const editDesign = (name, designId) => {

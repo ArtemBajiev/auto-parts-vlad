@@ -1,51 +1,54 @@
 <template>
   <div class="container">
     <div class="filter-car" :class="{ 'close-filter-car': !showFilter }">
-      <h3>Поиск детали</h3>
-      <input
-        @input.prevent="searchProd(search)"
-        v-model="search"
-        type="text"
-        class="form-control"
-      />
-      <h3>Выбор автомобиля</h3>
-      <form class="form" action="">
+      <div class="my-2" v-if="!store.fullNameCar[0].name">
+        <h3>Поиск детали</h3>
         <input
-          class="form-control"
-          :disabled="step != 2"
-          v-model="fullNameCar[0].name"
+          @input.prevent="searchProd(store.search)"
+          v-model="store.search"
           type="text"
-          placeholder="Введите марку"
+          class="form-control"
         />
+      </div>
+      <div v-if="showFilter">
+        <h3>Выбор автомобиля</h3>
+        <form class="form" action="">
+          <input
+            class="form-control"
+            :disabled="step != 2"
+            v-model="store.fullNameCar[0].name"
+            type="text"
+            placeholder="Введите марку"
+          />
 
-        <input
-          :disabled="step != 3"
-          class="form-control"
-          v-model="fullNameCar[1].name"
-          type="text"
-          placeholder="Введите модель"
-        />
-        <input
-          :disabled="step != 4"
-          class="form-control"
-          v-model="fullNameCar[2].name"
-          type="text"
-          placeholder="Введите поколение модели"
-        />
-        <input
-          :disabled="step.value == 5 && dataProducts.length == 0 ? false : true"
-          class="form-control"
-          v-model="fullNameCar[3].name"
-          type="text"
-          placeholder="Введите модификацию"
-        />
-        <button class="btn btn-light" @click="previousStep()">сбросить фильтр</button>
-      </form>
+          <input
+            :disabled="step != 3"
+            class="form-control"
+            v-model="store.fullNameCar[1].name"
+            type="text"
+            placeholder="Введите модель"
+          />
+          <input
+            :disabled="step != 4"
+            class="form-control"
+            v-model="store.fullNameCar[2].name"
+            type="text"
+            placeholder="Введите поколение модели"
+          />
+          <input
+            :disabled="step.value == 5 && store.dataProducts.length == 0 ? false : true"
+            class="form-control"
+            v-model="store.fullNameCar[3].name"
+            type="text"
+            placeholder="Введите модификацию"
+          />
+        </form>
+      </div>
 
       <ul v-if="showFilter" class="filter-car__list">
         <li
           class="filter-car__item"
-          @click="(selectItem = item), nextStep()"
+          @click="(selectItem = item), (store.search = ''), nextStep()"
           v-for="item in searchCar"
           :key="item.id"
         >
@@ -53,10 +56,13 @@
           {{ item?.name }}{{ item?.text }}
         </li>
       </ul>
+      <button class="btn btn-light btn-reset" @click.prevent="previousStep()">
+        сбросить фильтр
+      </button>
     </div>
     <div class="filter-type">
       <select
-        v-if="step != 2"
+        v-if="step != 2 && !store.search"
         class="form-select"
         v-model="filterType"
         @change="FilterType()"
@@ -71,9 +77,9 @@
     </div>
     <div>
       <Transition name="fade">
-        <ul v-if="dataProducts.length != 0" class="products-list">
+        <ul v-if="store.dataProducts.length != 0" class="products-list">
           <CardProduct
-            v-for="item in dataProducts"
+            v-for="item in store.dataProducts"
             :brand="item.detail_brand"
             :key="item.id"
             :price="item.price"
@@ -87,7 +93,7 @@
         </ul>
       </Transition>
     </div>
-    <p class="btn m-auto" v-if="dataProducts.length == 0 && step != 2 && loading == false">
+    <p class="btn m-auto" v-if="store.dataProducts.length == 0 && step != 2 && loading == false">
       Данной детали сейчас нет на складе
     </p>
     <LoaderComp v-if="loading"></LoaderComp>
@@ -105,6 +111,7 @@ import { computed } from 'vue'
 import getType from '@/composition/getType'
 import { useGlobalStore } from '@/stores/globalStore'
 
+const store = useGlobalStore()
 const { Type } = getType()
 const { getProductModification, searchProduct } = getProduct()
 const { getBrand, getModification, getGenerations, getDesigns } = getCar()
@@ -112,31 +119,33 @@ const { getBrand, getModification, getGenerations, getDesigns } = getCar()
 const data = ref([])
 const selectItem = ref()
 const step = ref(1)
-const dataProducts = ref([])
+
 const showFilter = ref(true)
-const fullNameCar = ref([{ name: '' }, { name: '' }, { name: '' }, { name: '' }])
+
 const typeData = ref()
 const filterType = ref('')
 const loading = ref(true)
-const search = ref('')
 
 const searchCar = computed(() => {
-  return data.value.filter((x) => x.name.includes(fullNameCar.value[step.value - 2].name))
+  return data.value.filter((x) => x.name.includes(store.fullNameCar[step.value - 2].name))
 })
 function FilterType() {
   getData(step.value, selectItem.value.id, filterType.value, false)
 }
 function searchProd(text) {
+  store.fullNameCar = [{ name: '' }, { name: '' }, { name: '' }, { name: '' }]
   if (text) {
+    showFilter.value = false
     searchProduct(text).then((res) => {
-      dataProducts.value = res.data.details
+      store.dataProducts = res.data.details
       showFilter.value = false
     })
   } else {
-    dataProducts.value = []
-    showFilter.value = true
+    store.dataProducts = []
+    previousStep()
   }
 }
+// Выбор автомибиля
 function getData(step, select, type, nextStep) {
   loading.value = true
   switch (step) {
@@ -150,7 +159,7 @@ function getData(step, select, type, nextStep) {
     case 2:
       getDesigns(select, type).then((res) => {
         data.value = res.data.designs
-        dataProducts.value = res.data.details
+        store.dataProducts = res.data.details
         loading.value = false
         if (nextStep) {
           fillFullNameCar(0)
@@ -161,7 +170,7 @@ function getData(step, select, type, nextStep) {
     case 3:
       getGenerations(select, type).then((res) => {
         data.value = res.data.generations
-        dataProducts.value = res.data.details
+        store.dataProducts = res.data.details
         loading.value = false
         if (nextStep) {
           fillFullNameCar(1)
@@ -172,7 +181,7 @@ function getData(step, select, type, nextStep) {
     case 4:
       getModification(select, type).then((res) => {
         data.value = res.data.modifications
-        dataProducts.value = res.data.details
+        store.dataProducts = res.data.details
         loading.value = false
         if (nextStep) {
           fillFullNameCar(2)
@@ -181,7 +190,7 @@ function getData(step, select, type, nextStep) {
       return
     case 5:
       getProductModification(select, type).then((res) => {
-        dataProducts.value = res.data.details
+        store.dataProducts = res.data.details
         loading.value = false
         if (nextStep) {
           fillFullNameCar(3)
@@ -202,13 +211,15 @@ function nextStep() {
 
 function previousStep() {
   showFilter.value = true
+  store.search = ''
+  store.dataProducts = []
   step.value = 1
-  getData(step.value, fullNameCar.value[step.value - 1].id, '', true)
+  getData(step.value, store.fullNameCar[step.value - 1].id, '', true)
   step.value += 1
-  fullNameCar.value = []
+  store.fullNameCar = [{ name: '' }, { name: '' }, { name: '' }, { name: '' }]
 }
 function fillFullNameCar(i) {
-  fullNameCar.value[i] = selectItem.value
+  store.fullNameCar[i] = selectItem.value
   loading.value = false
 }
 onMounted(() => {
@@ -216,14 +227,14 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .filter-car {
   color: black;
   padding: 20px 12px;
   box-shadow: 0px 5px 5px -4px rgba(0, 0, 0, 0.63);
   border-radius: 0px 0px 8px 8px;
-  height: 400px;
   overflow: hidden;
+  position: relative;
   transition: all 1s ease-in-out;
   li {
     cursor: pointer;
@@ -246,12 +257,18 @@ onMounted(() => {
   grid-gap: 20px;
   padding: 0px 20px;
   padding-top: 40px;
-  height: 170px;
   justify-content: center;
   align-items: center;
   text-align: center;
   overflow: auto;
 }
+.btn-reset {
+  bottom: 10px;
+  right: 10px;
+  width: 100%;
+  display: block;
+}
+
 .filter-car__item {
   border: 1px solid rgba(128, 128, 128, 0.23);
   padding: 20px;
@@ -278,7 +295,6 @@ select {
 }
 
 .close-filter-car {
-  height: 150px;
 }
 .fade-enter-active,
 .fade-leave-active {

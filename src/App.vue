@@ -60,4 +60,16 @@ a {
 .v-leave-to {
   opacity: 0;
 }
+*::-webkit-scrollbar {
+  width: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #dedede;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--primary-light);
+  border-radius: 5px;
+}
 </style>

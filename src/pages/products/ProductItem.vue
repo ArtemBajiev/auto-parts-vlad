@@ -1,10 +1,16 @@
 <template>
   <div class="container">
+    <div class="product-item__links">
+      <router-link class="product-item__link" to="/products">Каталог</router-link>/<span
+        class="product-item__link"
+        >{{ data?.type.name }}</span
+      >
+    </div>
+    <h1>{{ data?.type.name + ' ' + data?.brand.name }}</h1>
     <div class="card-wraper">
-      <h1>{{ data?.type.name + ' ' + data?.brand.name }}</h1>
-      <img width="350" :src="useGlobalStore().url + data?.image" alt="" />
       <div class="text-and-cart">
         <div class="specifications">
+          <img width="350" :src="useGlobalStore().url + data?.image" alt="" />
           <div class="specifications-item">
             <p>Бренд:</p>
             <div class="line"></div>
@@ -27,12 +33,12 @@
           </div>
           <div class="description">
             <p>Описание:</p>
-
             <p>
-              {{ data.descr }}
+              {{ data?.descr }}
             </p>
           </div>
         </div>
+
         <div class="in-cart">
           <div class="authorization" v-if="authStore.isAuth == false">
             <p><router-link to="/cart">Авторизуйтесь,</router-link>&nbsp;что бы сделать заказ</p>
@@ -76,6 +82,14 @@ getProductItem(route.params.id).then((res) => {
 </script>
 
 <style scoped>
+.product-item__links {
+  margin-top: 20px;
+}
+.product-item__link {
+  color: gray;
+  padding: 10px;
+  cursor: pointer;
+}
 .line {
   border-bottom: 1px dashed gray;
   flex: 1 1 auto;
@@ -105,8 +119,11 @@ getProductItem(route.params.id).then((res) => {
 }
 .specifications {
   width: 100%;
-  padding: 0px 15%;
+  padding-right: 2%;
   margin-top: 40px;
+  img {
+    margin-right: 20px;
+  }
 }
 .specifications-item {
   border-bottom: 1px;
@@ -140,11 +157,12 @@ getProductItem(route.params.id).then((res) => {
 }
 .card-wraper {
   padding-top: 40px;
+
   .text {
-    text-align: end;
+    text-align: justify;
   }
   h1 {
-    text-align: center;
+    text-align: justify;
   }
   img {
     float: left;

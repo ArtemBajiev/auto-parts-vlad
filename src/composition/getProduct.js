@@ -10,9 +10,13 @@ export default function getProduct() {
   const getProductItem = (detailId) => {
     return axios.get(api + '/api/detail', { params: { detailId } })
   }
+  const searchProduct = (filter) => {
+    return axios.get(api + '/api/details/filter', { params: { filter } })
+  }
 
   return {
     getProductModification,
-    getProductItem
+    getProductItem,
+    searchProduct
   }
 }

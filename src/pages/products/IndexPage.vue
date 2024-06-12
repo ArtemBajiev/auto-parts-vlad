@@ -1,6 +1,13 @@
 <template>
   <div class="container">
     <div class="filter-car" :class="{ 'close-filter-car': !showFilter }">
+      <h3>Поиск детали</h3>
+      <input
+        @input.prevent="searchProd(search)"
+        v-model="search"
+        type="text"
+        class="form-control"
+      />
       <h3>Выбор автомобиля</h3>
       <form class="form" action="">
         <input
@@ -99,7 +106,7 @@ import getType from '@/composition/getType'
 import { useGlobalStore } from '@/stores/globalStore'
 
 const { Type } = getType()
-const { getProductModification } = getProduct()
+const { getProductModification, searchProduct } = getProduct()
 const { getBrand, getModification, getGenerations, getDesigns } = getCar()
 
 const data = ref([])
@@ -111,12 +118,24 @@ const fullNameCar = ref([{ name: '' }, { name: '' }, { name: '' }, { name: '' }]
 const typeData = ref()
 const filterType = ref('')
 const loading = ref(true)
+const search = ref('')
 
 const searchCar = computed(() => {
   return data.value.filter((x) => x.name.includes(fullNameCar.value[step.value - 2].name))
 })
 function FilterType() {
   getData(step.value, selectItem.value.id, filterType.value, false)
+}
+function searchProd(text) {
+  if (text) {
+    searchProduct(text).then((res) => {
+      dataProducts.value = res.data.details
+      showFilter.value = false
+    })
+  } else {
+    dataProducts.value = []
+    showFilter.value = true
+  }
 }
 function getData(step, select, type, nextStep) {
   loading.value = true
@@ -204,6 +223,7 @@ onMounted(() => {
   box-shadow: 0px 5px 5px -4px rgba(0, 0, 0, 0.63);
   border-radius: 0px 0px 8px 8px;
   height: 400px;
+  overflow: hidden;
   transition: all 1s ease-in-out;
   li {
     cursor: pointer;
@@ -226,11 +246,11 @@ onMounted(() => {
   grid-gap: 20px;
   padding: 0px 20px;
   padding-top: 40px;
+  height: 170px;
   justify-content: center;
   align-items: center;
   text-align: center;
   overflow: auto;
-  height: 70%;
 }
 .filter-car__item {
   border: 1px solid rgba(128, 128, 128, 0.23);
@@ -243,6 +263,7 @@ onMounted(() => {
 }
 .form {
   display: flex;
+  padding-bottom: 10px;
   input {
     margin: 0px 5px;
   }

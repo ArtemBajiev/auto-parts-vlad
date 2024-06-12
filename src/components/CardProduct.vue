@@ -14,9 +14,10 @@
         <p class="count">В наличии: <br />{{ props.count }}</p>
       </div>
     </router-link>
-    <div class="btn-container">
+    <div class="btn-container" v-show="props.count > 0">
       <ButtonBy @click="storeShopping.addCard(props.id)"></ButtonBy>
     </div>
+    <div class="btn-container empty" v-show="props.count <= 0">Нет в наличии</div>
   </li>
 </template>
 
@@ -97,5 +98,10 @@ h2 {
 .btn-container {
   width: 100%;
   padding: 0px 20px;
+}
+.empty {
+  color: rgb(0, 0, 0);
+  height: 40px;
+  border-radius: 20px;
 }
 </style>

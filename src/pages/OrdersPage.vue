@@ -42,8 +42,8 @@ onMounted(() => {
   GetOrders().then((res) => {
     dataOrders.value = res.data.user
     dataOrders.value.orders = dataOrders.value.orders.reverse()
-    const date = new Date()
     dataOrders.value.orders.forEach((item) => {
+      const date = new Date(item.created_at)
       item.created_at =
         date.getDate() +
         '/' +

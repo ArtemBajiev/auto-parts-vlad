@@ -21,11 +21,17 @@
             <div class="right">
               <p>Количество:</p>
               <div class="input-count">
-                <button class="btn-input-count" @click="item.quantity++, updateItem()">
+                <button
+                  class="btn-input-count"
+                  @click="item.quantity < item.count ? item.quantity++ : item.count, updateItem()"
+                >
                   <Icon height="20" color="black" :icon="'eva:arrow-up-fill'" />
                 </button>
                 <input :value="item.quantity" min="1" disabled :max="item.count" type="text" />
-                <button class="btn-input-count" @click="item.quantity--, updateItem()">
+                <button
+                  class="btn-input-count"
+                  @click="item.quantity > 0 ? item.quantity-- : 0, updateItem()"
+                >
                   <Icon height="20" color="black" :icon="'eva:arrow-down-fill'" />
                 </button>
               </div>

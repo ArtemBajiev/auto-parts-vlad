@@ -132,6 +132,7 @@ const searchCar = computed(() => {
 function FilterType() {
   getData(step.value, selectItem.value.id, filterType.value, false)
 }
+
 function searchProd(text) {
   store.fullNameCar = [{ name: '' }, { name: '' }, { name: '' }, { name: '' }]
   if (text) {
@@ -200,15 +201,16 @@ function getData(step, select, type, nextStep) {
       return
   }
 }
+// получение типов
 Type().then((res) => {
   typeData.value = res.data.types
 })
+// следующий шаг
 function nextStep() {
   getData(step.value, selectItem.value?.id, filterType.value, true)
-
   step.value = step.value + 1 == 6 ? 5 : step.value + 1
 }
-
+// сбросить фильтр
 function previousStep() {
   showFilter.value = true
   store.search = ''
@@ -218,6 +220,7 @@ function previousStep() {
   step.value += 1
   store.fullNameCar = [{ name: '' }, { name: '' }, { name: '' }, { name: '' }]
 }
+// Заполнить input выбранными авто
 function fillFullNameCar(i) {
   store.fullNameCar[i] = selectItem.value
   loading.value = false

@@ -1,11 +1,12 @@
 <template>
   <ul class="orders-list">
-    <li v-for="item in dataOrders.orders" :key="item.id" class="orders-item">
+    <li v-for="item in dataOrders" :key="item.id" class="orders-item">
       <h5>Номер заказа:&nbsp;{{ item.id }}</h5>
       <div class="orders-list__buttons">
         <button class="btn" @click="change(item.id, 'В обработке')">В обработке</button
         ><button class="btn" @click="change(item.id, 'В сборке')">В сборке</button
         ><button class="btn" @click="change(item.id, 'Готов к выдаче')">Готов к выдаче</button>
+        <button class="btn" @click="change(item.id, 'Завершён')">Завершён</button>
       </div>
       <div class="orders-item_wrapper">
         <p>
@@ -39,9 +40,9 @@ import { ref } from 'vue'
 const dataOrders = ref([])
 const { getOrders, changeStatus } = adminOrders()
 function ParseList() {
-  dataOrders.value.orders.forEach((item) => (item.list = JSON.parse(item.list)))
-  const date = new Date()
-  dataOrders.value.orders.forEach((item) => {
+  dataOrders.value.forEach((item) => {
+    item.list = JSON.parse(item.list)
+    const date = new Date(item.created_at)
     item.created_at =
       date.getDate() +
       '/' +
@@ -53,6 +54,8 @@ function ParseList() {
       ':' +
       date.getMinutes()
   })
+
+  dataOrders.value = dataOrders.value.reverse()
 }
 function change(id, status) {
   changeStatus(id, status).then(() => {
@@ -62,7 +65,7 @@ function change(id, status) {
 }
 function getData() {
   getOrders().then((res) => {
-    dataOrders.value = res.data
+    dataOrders.value = res.data.orders
     ParseList()
   })
 }
@@ -112,13 +115,16 @@ getData()
   button {
     margin: 5px;
     &:nth-child(1) {
-      background-color: rgb(191, 0, 0);
+      background-color: rgb(142, 0, 0);
     }
     &:nth-child(2) {
-      background-color: rgb(211, 1, 1);
+      background-color: rgb(179, 0, 0);
     }
     &:nth-child(3) {
-      background-color: red;
+      background-color: rgb(204, 0, 0);
+    }
+    &:nth-child(4) {
+      background-color: rgb(255, 0, 0);
     }
   }
 }

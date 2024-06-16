@@ -1,7 +1,7 @@
 <template>
   <section name="orders">
     <div class="container">
-      <ul class="orders-list">
+      <ul v-if="dataOrders.orders.length" class="orders-list">
         <li v-for="item in dataOrders.orders" :key="item.id" class="orders-item">
           <h5>Номер заказа:&nbsp;{{ item.id }}</h5>
           <div class="orders-item_wrapper">
@@ -26,6 +26,7 @@
           </ul>
         </li>
       </ul>
+      <p v-else class="my-3 mx-auto">На данный момент вы не сделали ни одного заказа</p>
     </div>
   </section>
 </template>

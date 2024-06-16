@@ -9,8 +9,11 @@ export const useGlobalStore = defineStore('globalStore', () => {
   const search = ref('')
   const user = ref('')
   const fullNameCar = ref([{ name: '' }, { name: '' }, { name: '' }, { name: '' }])
-  GetOrders().then((res) => {
-    user.value = res.data.user
-  })
-  return { url, dataProducts, search, fullNameCar, user }
+  function getUser(){
+    GetOrders().then((res) => {
+      user.value = res.data.user
+    })
+  }
+  getUser()
+  return { url, dataProducts, search, fullNameCar, user, getUser }
 })

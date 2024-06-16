@@ -9,6 +9,7 @@ import HomeAdmin from '@/pages/admin/HomeAdmin.vue'
 import AdminLayout from '@/pages/admin/AdminLayout.vue'
 import CarsAndProducts from '@/pages/admin/CarsAndProducts.vue'
 import ProductItemAdmin from '@/pages/admin/ProductItemAdmin.vue'
+import { useGlobalStore } from '@/stores/globalStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,34 +49,43 @@ const router = createRouter({
       path: '/admin',
       name: 'HomeAdmin',
       component: AdminLayout,
-      // meta: { auth: true }
+      meta: { admin: true },
       children: [
         {
           path: '/admin/home',
           name: 'home-admin',
-          component: HomeAdmin
+          component: HomeAdmin,
+          meta: { admin: true }
         },
         {
           path: '/admin/cars-and-products',
           name: 'cars-and-products',
-          component: CarsAndProducts
+          component: CarsAndProducts,
+          meta: { admin: true }
         },
         {
           path: '/admin/product-item/:id/:mod?',
           name: 'product-item',
-          component: ProductItemAdmin
+          component: ProductItemAdmin,
+          meta: { admin: true }
         }
       ]
     }
   ]
 })
 router.beforeEach((to, from, next) => {
+  const store = useGlobalStore()
   const currentUser = localStorage.getItem('Token')
   const requireAuth = to.matched.some((record) => record.meta.auth)
+  const requireAdmin = to.matched.some((record) => record.meta.admin)
   if (currentUser == null && requireAuth) {
     next('/login')
   } else {
-    next()
+    if (!store.user.admin && requireAdmin) {
+      next('/')
+    } else {
+      next()
+    }
   }
 })
 export default router

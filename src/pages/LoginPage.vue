@@ -12,10 +12,10 @@
       </div>
       <transition name="switch" mode="out-in">
         <form @submit.prevent="LoginFunc()" v-if="switchData == 0">
-          <input class="form-control my-3" v-model="loginData.email" placeholder="email" />
+          <input class="form-control my-3" v-model="registrationData.email" placeholder="email" />
           <input
             class="form-control"
-            v-model="loginData.password"
+            v-model="registrationData.password"
             type="password"
             placeholder="password"
           />
@@ -52,14 +52,13 @@ import { ref } from 'vue'
 import router from '@/router'
 import authentication from '@/composition/authentication'
 import { useAuthentication } from '@/stores/authentication'
+import { useGlobalStore } from '@/stores/globalStore'
+const store = useGlobalStore()
 const authStore = useAuthentication()
 const { login, registration } = authentication()
 const error = ref(false)
 const errorText = ref('')
-const loginData = ref({
-  email: '',
-  password: ''
-})
+
 const registrationData = ref({
   email: '',
   name: '',
@@ -69,11 +68,14 @@ const registrationData = ref({
 let switchData = ref(0)
 
 function LoginFunc() {
-  login(loginData.value.email, loginData.value.password)
+  login(registrationData.value.email, registrationData.value.password)
     .then((res) => {
       localStorage.setItem('Token', res.data.token)
       authStore.getToken()
-      router.go(-1)
+      setTimeout(() => {
+        store.getUser()
+        router.go(-1)
+      }, 2000)
     })
     .catch((error) => {
       error.value = true
@@ -89,6 +91,7 @@ function RegistrationFunc() {
   )
     .then(() => {
       switchData.value = 0
+      LoginFunc()
     })
     .catch((error) => {
       console.error(error.response.data.errors)

@@ -23,6 +23,12 @@
               Выйти
             </button>
           </li>
+          <li v-if="storeAuthentication.isAuth == true" class="menu-item">
+            <router-link v-if="store.user?.admin" to="/admin">
+              <Icon color="white" class="me-2" icon="icon-park-outline:add-mode" />
+              Админ
+            </router-link>
+          </li>
         </ul>
         <div class="shopping-card">
           <router-link to="/cart">
@@ -43,7 +49,8 @@ import { Icon } from '@iconify/vue'
 import { useShoppingCard } from '@/stores/shoppingCard'
 import { onMounted } from 'vue'
 import { useAuthentication } from '@/stores/authentication'
-
+import { useGlobalStore } from '@/stores/globalStore'
+const store = useGlobalStore()
 const storeAuthentication = useAuthentication()
 const storeShopping = useShoppingCard()
 onMounted(() => {
@@ -60,11 +67,6 @@ const menuData = ref([
     url: '/products',
     icon: 'icon-park-outline:ad-product'
   },
-  // {
-  //   name: 'Payments',
-  //   url: '/',
-  //   icon: 'icon-park-outline:weixin-cards-offers'
-  // },
   {
     name: 'Заказы',
     url: '/orders',

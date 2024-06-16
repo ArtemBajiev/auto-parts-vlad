@@ -44,7 +44,7 @@
             >Описание
             <textarea
               required
-              class="form-control"
+              class="form-control h-50"
               placeholder="Описание"
               name=""
               v-model="data.descr"
@@ -53,12 +53,6 @@
           </label>
           <button type="submit" class="btn btn-danger">Сохранить</button>
         </form>
-        <div class="in-cart">
-          <div class="authorization" v-if="authStore.isAuth == false">
-            <p><router-link to="/cart">Авторизуйтесь,</router-link>&nbsp;что бы сделать заказ</p>
-            <div class="icon-right"></div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

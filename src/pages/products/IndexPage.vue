@@ -277,6 +277,10 @@ onMounted(() => {
   padding: 20px;
   border-radius: 15px;
   transition: all 0.3s ease-in-out;
+
+  img {
+    border-radius: 10px;
+  }
   &:hover {
     background-color: rgba(128, 128, 128, 0.112);
   }

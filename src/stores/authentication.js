@@ -16,6 +16,7 @@ export const useAuthentication = defineStore('authentication', () => {
     localStorage.removeItem('Token')
     isAuth.value = false
     token.value = null
+    location.reload()
   }
 
   return { getToken, isAuth, token, logout }
